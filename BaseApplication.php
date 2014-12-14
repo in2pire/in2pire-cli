@@ -82,7 +82,10 @@ abstract class BaseApplication implements ApplicationInterface
      */
     public function run()
     {
-        // Do nothing.
+        if (false === $this->boot()) {
+            throw new \RuntimeExeption('Cannot not boot application');
+        }
+
         return $this;
     }
 }

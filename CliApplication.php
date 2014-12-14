@@ -155,8 +155,6 @@ class CliApplication extends BaseApplication
         // Boot parent.
         parent::boot();
 
-        // Set other variables
-
         return $this;
     }
 
@@ -169,7 +167,10 @@ class CliApplication extends BaseApplication
     public function run()
     {
         // Boot the application.
-        $this->boot();
+        if (false === $this->boot()) {
+            throw new \RuntimeExeption('Cannot not boot application');
+        }
+
         // Let symfony/console do the rest.
         $this->runner->run($this->request, $this->response);
         return $this;

@@ -10,7 +10,7 @@
 
 namespace In2pire\Cli\Validator;
 
-namespace In2pire\Component\Utility\String;
+use In2pire\Component\Utility\String;
 
 /**
  * Validator container.

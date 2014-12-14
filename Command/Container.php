@@ -10,7 +10,7 @@
 
 namespace In2pire\Cli\Command;
 
-namespace In2pire\Component\Utility\String;
+use In2pire\Component\Utility\String;
 
 /**
  * Command container.

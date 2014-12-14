@@ -10,7 +10,7 @@
 
 namespace In2pire\Cli;
 
-abstract class BaseApplication implements ApplicationInterface
+abstract class BaseCliApplication implements CliApplicationInterface
 {
     /**
      * Settings.

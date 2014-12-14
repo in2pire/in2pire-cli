@@ -10,7 +10,7 @@
 
 namespace In2pire\Cli;
 
-interface ApplicationInterface
+interface CliApplicationInterface
 {
     /**
      * Boot.

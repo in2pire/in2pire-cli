@@ -367,8 +367,8 @@ abstract class CliCommand extends ConsoleCommand
     protected function executeTask($task, InputInterface $input, OutputInterface $output, $data)
     {
         $this->doPreExecuteTask($task, $input, $output, $data);
-        $task->setData($data)->run($input, $output);
-        $this->doPostExecuteTask($task, $input, $output, $data);
+        $return = $task->setData($data)->run($input, $output);
+        $this->doPostExecuteTask($task, $input, $output, $data, $return);
         return $task->isSuccessful();
     }
 

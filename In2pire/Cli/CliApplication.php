@@ -13,7 +13,6 @@ namespace In2pire\Cli;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Console\Input\ArgvInput as ConsoleInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use In2pire\Cli\Configuration;
 use In2pire\Cli\Command\Container as CommandContainer;
 
 class CliApplication extends BaseApplication

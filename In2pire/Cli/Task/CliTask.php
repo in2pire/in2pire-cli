@@ -13,7 +13,7 @@ namespace In2pire\Cli\Task;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use In2pire\Configuration;
+use In2pire\Cli\Configuration;
 use In2pire\Component\Utility\NestedArray;
 use In2pire\Cli\Task\Container as TaskContainer;
 

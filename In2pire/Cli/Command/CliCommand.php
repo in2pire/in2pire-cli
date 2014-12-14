@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Input\InputArgument as ConsoleInputArgument;
 use Symfony\Component\Console\Input\InputOption as ConsoleInputOption;
-use In2pire\Configuration;
+use In2pire\Cli\Configuration;
 use In2pire\Component\Utility\NestedArray;
 use In2pire\Cli\Task\Container as TaskContainer;
 use In2pire\Cli\Question\Container as QuestionContainer;

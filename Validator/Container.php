@@ -43,7 +43,7 @@ final class Container
             } else {
                 // FQCN
                 $class = explode('.', $validator);
-                $class = array_map(array('String', 'convertToCamelCase'), $class);
+                $class = array_map(array('In2pire\\Component\\Utility\\String', 'convertToCamelCase'), $class);
                 $class = implode('\\', $class);
                 $validator = substr($validator, strrpos($validator, '.') + 1);
             }
@@ -55,7 +55,7 @@ final class Container
         }
 
         if (!class_exists($class)) {
-            throw new \RuntimeException('Unknow validator ' . $validator);
+            throw new \RuntimeException('Unknow validator ' . $cacheKey);
         }
 
         return new $class($command);

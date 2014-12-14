@@ -43,7 +43,7 @@ final class Container
             } else {
                 // FQCN
                 $class = explode('.', $command);
-                $class = array_map(array('String', 'convertToCamelCase'), $class);
+                $class = array_map(array('In2pire\\Component\\Utility\\String', 'convertToCamelCase'), $class);
                 $class = implode('\\', $class);
                 $command = substr($command, strrpos($command, '.') + 1);
             }
@@ -55,7 +55,7 @@ final class Container
         }
 
         if (!class_exists($class)) {
-            throw new \RuntimeException('Unknow command ' . $command);
+            throw new \RuntimeException('Unknow command ' . $cacheKey);
         }
 
         return new $class($app);

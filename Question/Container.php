@@ -29,7 +29,7 @@ final class Container
             } else {
                 // FQCN
                 $class = explode('.', $question);
-                $class = array_map(array('String', 'convertToCamelCase'), $class);
+                $class = array_map(array('In2pire\\Component\\Utility\\String', 'convertToCamelCase'), $class);
                 $class = implode('\\', $class);
                 $question = substr($question, strrpos($question, '.') + 1);
             }
@@ -44,7 +44,7 @@ final class Container
         $class = __NAMESPACE__ . '\\' . Utility::convertToCamelCase($question);
 
         if (!class_exists($class)) {
-            throw new \RuntimeException('Unknow question ' . $question);
+            throw new \RuntimeException('Unknow question ' . $cacheKey);
         }
 
         return new $class($command);

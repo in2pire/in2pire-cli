@@ -29,7 +29,7 @@ final class Container
             } else {
                 // FQCN
                 $class = explode('.', $taskId);
-                $class = array_map(array('String', 'convertToCamelCase'), $class);
+                $class = array_map(array('In2pire\\Component\\Utility\\String', 'convertToCamelCase'), $class);
                 $class = implode('\\', $class);
                 $taskId = substr($taskId, strrpos($taskId, '.') + 1);
             }
@@ -41,7 +41,7 @@ final class Container
         }
 
         if (!class_exists($class)) {
-            throw new \RuntimeException('Unknown task ' . $taskId);
+            throw new \RuntimeException('Unknown task ' . $cacheKey);
         }
 
         return new $class($command);

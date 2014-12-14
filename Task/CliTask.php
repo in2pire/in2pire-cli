@@ -20,6 +20,16 @@ use In2pire\Cli\Task\Container as TaskContainer;
 abstract class CliTask
 {
     /**
+     * Error code.
+     */
+    const RETURN_ERROR = 1;
+
+    /**
+     * Success code.
+     */
+    const RETURN_SUCCESS = 0;
+
+    /**
      * Task ID.
      *
      * @var string
@@ -156,7 +166,7 @@ abstract class CliTask
      */
     public function isSuccessful()
     {
-        return $this->returnCode == 0;
+        return $this->returnCode == static::RETURN_SUCCESS;
     }
 
     protected function runDependency($task, $taskInfo, InputInterface $input, OutputInterface $output)
@@ -175,14 +185,14 @@ abstract class CliTask
 
     protected function executeDependencies(InputInterface $input, OutputInterface $output)
     {
-        $return = 1;
+        $return = true;
 
         foreach ($this->dependencies as $taskId => $taskInfo) {
             $task = TaskContainer::create($taskId, $this->command);
 
             // Failed to execute task.
             if ($task && !$this->runDependency($task, $taskInfo, $input, $output)) {
-                $return = 0;
+                $return = false;
                 break;
             }
         }
@@ -257,12 +267,12 @@ abstract class CliTask
      */
     public function run(InputInterface $input, OutputInterface $output)
     {
-        $this->returnCode = 0;
+        $this->returnCode = static::RETURN_SUCCESS;
         $this->doPreRun($input, $output);
 
         if (!$this->executeDependencies($input, $output)) {
-            // Failed to run dependency.
-            $this->returnCode = 1;
+            // Failed to run dependencies.
+            $this->returnCode = static::RETURN_ERROR;
         } else {
             // Execute task.
             $this->returnCode = (int) $this->execute($input, $output);

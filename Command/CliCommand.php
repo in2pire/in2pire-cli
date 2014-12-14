@@ -28,6 +28,16 @@ use In2pire\Cli\Validator\Container as ValidatorContainer;
 abstract class CliCommand extends ConsoleCommand
 {
     /**
+     * Error code.
+     */
+    const RETURN_ERROR = 1;
+
+    /**
+     * Success code.
+     */
+    const RETURN_SUCCESS = 0;
+
+    /**
      * Command name.
      *
      * @var string
@@ -182,7 +192,7 @@ abstract class CliCommand extends ConsoleCommand
      */
     public function isSuccessful()
     {
-        return $this->returnCode == 0;
+        return $this->returnCode == static::RETURN_SUCCESS;
     }
 
     /**

@@ -239,7 +239,10 @@ abstract class CliTask
      * @return int $code
      *   Return code.
      */
-    abstract protected function execute(InputInterface $input, OutputInterface $output);
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        // Do nothing.
+    }
 
     /**
      * Run task.

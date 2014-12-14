@@ -168,7 +168,7 @@ class CliApplication extends BaseApplication
     {
         // Boot the application.
         if (false === $this->boot()) {
-            throw new \RuntimeExeption('Cannot not boot application');
+            exit(1);
         }
 
         // Let symfony/console do the rest.

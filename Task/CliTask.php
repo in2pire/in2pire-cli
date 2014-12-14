@@ -17,7 +17,7 @@ use In2pire\Cli\Configuration;
 use In2pire\Component\Utility\NestedArray;
 use In2pire\Cli\Task\Container as TaskContainer;
 
-abstract class CliTask implements TaskInterface
+abstract class CliTask
 {
     /**
      * Task ID.

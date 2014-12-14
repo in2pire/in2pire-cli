@@ -1,0 +1,23 @@
+# Ignore composer files
+/vendor/
+/composer.lock
+/composer.phar
+
+# Ignore sublime files
+*.sublime-*
+
+# Ignore netbeans files
+nbproject/*
+
+# Ignore windows files
+Thumbs.db
+
+# Ignore osx files
+.DS_Store
+._*
+
+# Ignore git files
+*.orig
+*.LOCAL
+*.REMOTE
+*.BASE

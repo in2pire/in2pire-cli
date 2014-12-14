@@ -1,0 +1,29 @@
+{
+    "name": "in2pire/cli",
+    "type": "library",
+    "description": "IN2PIRE CLI Framework",
+    "license": "MIT",
+    "keywords": ["in2pire", "inspire", "cli", "console"],
+    "authors": [
+        {
+            "name": "Nhat Tran",
+            "email": "nhat.tran@inspire.vn",
+            "homepage": "http://inspire.vn",
+            "role": "Founder"
+        }
+    ],
+    "support": {
+        "email": "nhat.tran@inspire.vn"
+    },
+    "require": {
+        "php": ">=5.4",
+        "symfony/yaml": ">=2.5",
+        "symfony/console": ">=2.5",
+        "in2pire/utility": "dev-master"
+    },
+    "autoload": {
+        "psr-0": { "In2pire\\Cli\\": "" }
+    },
+    "target-dir": "In2pire/Cli",
+    "minimum-stability": "dev"
+}

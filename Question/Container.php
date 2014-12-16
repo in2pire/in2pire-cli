@@ -40,9 +40,6 @@ final class Container
             ];
         }
 
-
-        $class = __NAMESPACE__ . '\\' . Utility::convertToCamelCase($question);
-
         if (!class_exists($class)) {
             throw new \RuntimeException('Unknow question ' . $cacheKey);
         }

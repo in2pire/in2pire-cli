@@ -14,6 +14,7 @@ use Symfony\Component\Console\Input\ArgvInput as ConsoleInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use In2pire\Cli\Application as ConsoleApplication;
 use In2pire\Cli\Command\Container as CommandContainer;
+use In2pire\Component\Utility\String;
 
 class CliApplication extends BaseCliApplication
 {
@@ -70,6 +71,18 @@ class CliApplication extends BaseCliApplication
         // Read application version.
         if (isset($this->settings['version'])) {
             $this->version = $this->settings['version'];
+        }
+
+        if (isset($this->settings['token'])) {
+            foreach ($this->settings['token'] as $key => $callback) {
+                list($class, $action) = explode('::', $callback);
+
+                $class = explode('.', $class);
+                $class = array_map(array('In2pire\\Component\\Utility\\String', 'convertToCamelCase'), $class);
+                $class = implode('\\', $class);
+
+                Token::register($key, [$class, $action]);
+            }
         }
 
         // Prepare symfony cli application.

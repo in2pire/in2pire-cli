@@ -99,7 +99,7 @@ class Token
     public static function generate($type, array $tokens, array $data = [], array $options = [])
     {
         $options += array('sanitize' => true);
-        $replacements = Module::invokeAll('token::replace', $type, $tokens, $data, $options);
+        $replacements = static::invoke($type, $tokens, $data, $options);
 
         // Allow other modules to alter the replacements.
         $context = array(

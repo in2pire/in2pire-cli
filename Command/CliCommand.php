@@ -17,10 +17,11 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Input\InputArgument as ConsoleInputArgument;
 use Symfony\Component\Console\Input\InputOption as ConsoleInputOption;
 use In2pire\Cli\Configuration;
-use In2pire\Component\Utility\NestedArray;
+use In2pire\Cli\Token;
 use In2pire\Cli\Task\Container as TaskContainer;
 use In2pire\Cli\Question\Container as QuestionContainer;
 use In2pire\Cli\Validator\Container as ValidatorContainer;
+use In2pire\Component\Utility\NestedArray;
 
 /**
  * Base Cli Command.
@@ -131,8 +132,8 @@ abstract class CliCommand extends ConsoleCommand
                 if (!empty($definition['name'])) {
                     $name        = $definition['name'];
                     $mode        = empty($definition['mode']) ? null : (int) $definition['mode'];
-                    $description = empty($definition['description']) ? '' : $definition['description'];
-                    $default     = empty($definition['default']) ? null : $definition['default'];
+                    $description = empty($definition['description']) ? '' : Token::replace($definition['description']);
+                    $default     = empty($definition['default']) ? null : Token::replace($definition['default']);
 
                     $definitions[] = new ConsoleInputArgument($name, $mode, $description, $default);
                 }
@@ -145,8 +146,8 @@ abstract class CliCommand extends ConsoleCommand
                     $name        = $definition['name'];
                     $shortcut    = empty($definition['shortcut']) ? null : $definition['shortcut'];
                     $mode        = empty($definition['mode']) ? null : (int) $definition['mode'];
-                    $description = empty($definition['description']) ? '' : $definition['description'];
-                    $default     = empty($definition['default']) ? null : $definition['default'];
+                    $description = empty($definition['description']) ? '' : Token::replace($definition['description']);
+                    $default     = empty($definition['default']) ? null : Token::replace($definition['default']);
 
                     $definitions[] = new ConsoleInputOption($name, $shortcut, $mode, $description, $default);
                 }

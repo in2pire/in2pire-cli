@@ -17,6 +17,13 @@ use Symfony\Component\Yaml\Yaml;
  */
 final class Configuration
 {
+    protected static $confPath = APP_CONF_PATH;
+
+    protected static function setConfigPath($path)
+    {
+        static::$confPath = $path;
+    }
+
     /**
      * Get path to configuration folder.
      *
@@ -25,7 +32,7 @@ final class Configuration
      */
     protected static function getConfigPath()
     {
-        return CLI_CONF_PATH;
+        return static::$confPath;
     }
 
     /**

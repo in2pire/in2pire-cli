@@ -60,7 +60,7 @@ class CliApplication extends BaseCliApplication
     public function __construct()
     {
         // Read settings file.
-        $this->settings = Configuration::getAll('application.cli', true);
+        $this->settings = Configuration::getAll('application', true);
 
         // Set application name.
         if (isset($this->settings['name'])) {

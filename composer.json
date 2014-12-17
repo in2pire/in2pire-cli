@@ -17,13 +17,12 @@
     },
     "require": {
         "php": ">=5.4",
-        "symfony/yaml": ">=2.5",
-        "symfony/console": ">=2.5",
-        "in2pire/utility": "dev-master"
+        "symfony/yaml": "@stable",
+        "symfony/console": "@stable",
+        "in2pire/utility": "1.x-dev"
     },
     "autoload": {
         "psr-0": { "In2pire\\Cli\\": "" }
     },
-    "target-dir": "In2pire/Cli",
-    "minimum-stability": "dev"
+    "target-dir": "In2pire/Cli"
 }

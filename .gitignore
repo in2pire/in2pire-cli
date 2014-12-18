@@ -1,7 +1,9 @@
 # Ignore composer files
 /vendor/
 /composer.lock
-/composer.phar
+
+# Ignore built file
+*.phar
 
 # Ignore sublime files
 *.sublime-*

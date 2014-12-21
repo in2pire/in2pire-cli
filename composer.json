@@ -24,5 +24,6 @@
     "autoload": {
         "psr-0": { "In2pire\\Cli\\": "" }
     },
-    "target-dir": "In2pire/Cli"
+    "target-dir": "In2pire/Cli",
+    "bin": ["compile"]
 }

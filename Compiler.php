@@ -76,15 +76,15 @@ class Compiler
     protected function configureIO()
     {
         $definition = new InputDefinition(array(
-            new InputOption('--help',            '-h', InputOption::VALUE_NONE, 'Display this help message.'),
-            new InputOption('--quiet',           '-q', InputOption::VALUE_NONE, 'Do not output any message.'),
-            new InputOption('--verbose',         '-v|vv|vvv', InputOption::VALUE_NONE, 'Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.'),
-            new InputOption('--config',          'c', InputOption::VALUE_OPTIONAL, 'Config Directory'),
-            new InputOption('--bin',             'b', InputOption::VALUE_OPTIONAL, 'Binary file'),
-            new InputOption('--no-compress',     null, InputOption::VALUE_OPTIONAL, 'Do not compress files'),
-            new InputOption('--no-optimization', null, InputOption::VALUE_OPTIONAL, 'Do not optimize class loader'),
-            new InputOption('--no-phar',         null, InputOption::VALUE_OPTIONAL, 'Do not add .phar extension'),
-            new InputOption('--executable',      null, InputOption::VALUE_OPTIONAL, 'Create executable file'),
+            new InputOption('--help',        '-h', InputOption::VALUE_NONE, 'Display this help message.'),
+            new InputOption('--quiet',       '-q', InputOption::VALUE_NONE, 'Do not output any message.'),
+            new InputOption('--verbose',     '-v|vv|vvv', InputOption::VALUE_NONE, 'Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.'),
+            new InputOption('--config',      'c', InputOption::VALUE_OPTIONAL, 'Config Directory'),
+            new InputOption('--bin',         'b', InputOption::VALUE_OPTIONAL, 'Binary file'),
+            new InputOption('--no-compress', null, InputOption::VALUE_OPTIONAL, 'Do not compress files'),
+            new InputOption('--no-optimize', null, InputOption::VALUE_OPTIONAL, 'Do not optimize class loader'),
+            new InputOption('--no-phar',     null, InputOption::VALUE_OPTIONAL, 'Do not add .phar extension'),
+            new InputOption('--executable',  null, InputOption::VALUE_OPTIONAL, 'Create executable file'),
         ));
 
         $this->input->bind($definition);
@@ -303,7 +303,7 @@ class Compiler
         }
 
         // Optimize classmap.
-        if (!$this->input->hasParameterOption('--no-optimization')) {
+        if (!$this->input->hasParameterOption('--no-optimize')) {
             $this->optimizeClassmap();
         }
 

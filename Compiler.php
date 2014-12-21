@@ -76,12 +76,15 @@ class Compiler
     protected function configureIO()
     {
         $definition = new InputDefinition(array(
-            new InputOption('--help',        '-h', InputOption::VALUE_NONE, 'Display this help message.'),
-            new InputOption('--quiet',       '-q', InputOption::VALUE_NONE, 'Do not output any message.'),
-            new InputOption('--verbose',     '-v|vv|vvv', InputOption::VALUE_NONE, 'Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.'),
-            new InputOption('--config',      'c', InputOption::VALUE_OPTIONAL, 'Config Directory'),
-            new InputOption('--bin',         'b', InputOption::VALUE_OPTIONAL, 'Binary file'),
-            new InputOption('--no-compress', null, InputOption::VALUE_OPTIONAL, 'Do not compress phar file'),
+            new InputOption('--help',            '-h', InputOption::VALUE_NONE, 'Display this help message.'),
+            new InputOption('--quiet',           '-q', InputOption::VALUE_NONE, 'Do not output any message.'),
+            new InputOption('--verbose',         '-v|vv|vvv', InputOption::VALUE_NONE, 'Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.'),
+            new InputOption('--config',          'c', InputOption::VALUE_OPTIONAL, 'Config Directory'),
+            new InputOption('--bin',             'b', InputOption::VALUE_OPTIONAL, 'Binary file'),
+            new InputOption('--no-compress',     null, InputOption::VALUE_OPTIONAL, 'Do not compress files'),
+            new InputOption('--no-optimization', null, InputOption::VALUE_OPTIONAL, 'Do not optimize class loader'),
+            new InputOption('--no-phar',         null, InputOption::VALUE_OPTIONAL, 'Do not add .phar extension'),
+            new InputOption('--executable',      null, InputOption::VALUE_OPTIONAL, 'Create executable file'),
         ));
 
         $this->input->bind($definition);
@@ -299,6 +302,11 @@ class Compiler
             }
         }
 
+        // Optimize classmap.
+        if (!$this->input->hasParameterOption('--no-optimization')) {
+            $this->optimizeClassmap();
+        }
+
         // Create phar file.
         $phar = new \Phar($pharFile, 0, $pharFileName);
         $phar->setSignatureAlgorithm(\Phar::SHA1);
@@ -315,6 +323,7 @@ class Compiler
             // Do not add tests folder
             ->exclude('Tests')
             ->exclude('tests')
+            ->exclude('composer.bak')
             // Exclude compiler itself.
             ->notName('Compiler.php')
             // Search in project folder
@@ -356,6 +365,29 @@ class Compiler
         }
 
         unset($phar);
+
+        if ($this->input->hasParameterOption('--executable')) {
+            $process = new Process('chmod +x "' . $pharFile . '"');
+            $process->run();
+
+            if (!$process->isSuccessful()) {
+                throw new \RuntimeException('Error occured while chmod phar file');
+            }
+        }
+
+        if ($this->input->hasParameterOption('--no-phar')) {
+            $noPharFile = substr($pharFile, 0, -5);
+            $process = new Process('mv "' . $pharFile . '" "' . $noPharFile . '"');
+            $process->run();
+
+            if (!$process->isSuccessful()) {
+                throw new \RuntimeException('Error occured while chmod phar file');
+            }
+
+            $pharFile = $noPharFile;
+        }
+
+        $this->output->writeln('<comment>Built file</comment> ' . $pharFile);
     }
 
     private function addFile($phar, $file, $strip = true)
@@ -431,6 +463,38 @@ class Compiler
         return $output;
     }
 
+    /**
+     * Optimize classmap
+     *
+     * @return boolean
+     *   True or False.
+     */
+    private function optimizeClassmap()
+    {
+        // Check composer.
+        $process = new Process('which composer');
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            $this->debug('<comment>Could not found composer command</comment>');
+            return false;
+        }
+
+        // Optimize.
+        $process = new Process('composer dump-autoload -o', $this->rootDir);
+        $process->run();
+
+        $result = $process->isSuccessful();
+
+        if ($result) {
+            $this->debug('<comment>Optimized classmap</comment>');
+        } else {
+            $this->debug('<comment>Could not optimize classmap</comment>');
+        }
+
+        return $result;
+    }
+
     private function getStub($binFile, $pharFileName)
     {
         $relativeBinFile = str_replace($this->rootDir, '', $binFile);
@@ -454,5 +518,68 @@ require 'phar://$pharFileName/$relativeBinFile';
 
 __HALT_COMPILER();
 EOF;
+    }
+
+    /**
+     * Backup composer directory.
+     *
+     * @param string $composerDir
+     *   Directory.
+     *
+     * @return boolean
+     *   True or False.
+     */
+    public static function backupComposer($composerDir)
+    {
+        $composerBak = $composerDir . '.bak';
+
+        // Back up class loaders.
+        if (is_dir($composerBak)) {
+            $process = new Process('rm -rf "' . $composerBak . '"');
+            $process->run();
+
+            if (!$process->isSuccessful()) {
+                return false;
+            }
+        }
+
+        // Backup
+        $process = new Process('cp -R "' . $composerDir . '" "' . $composerBak . '"');
+        $process->run();
+
+        return $process->isSuccessful();
+    }
+
+    /**
+     * Restore composer directory.
+     *
+     * @param string $composerDir
+     *   Directory.
+     *
+     * @return boolean
+     *   True or False.
+     */
+    public static function restoreComposer($composerDir)
+    {
+        $composerBak = $composerDir . '.bak';
+
+        // Restore class loaders.
+        if (!is_dir($composerBak)) {
+            return false;
+        }
+
+        // Remove current one.
+        $process = new Process('rm -rf "' . $composerDir . '"');
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            return false;
+        }
+
+        // Restore
+        $process = new Process('mv "' . $composerBak . '" "' . $composerDir . '"');
+        $process->run();
+
+        return $process->isSuccessful();
     }
 }

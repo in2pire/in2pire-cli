@@ -1,0 +1,72 @@
+#!/usr/bin/env php
+<?php
+
+if (PHP_SAPI !== 'cli') {
+    echo 'Warning: compiler should be invoked via the CLI version of PHP, not the ' . PHP_SAPI . ' SAPI' . PHP_EOL;
+    exit(1);
+}
+
+$dirs = [__DIR__ . '/../../', __DIR__ . '/../vendor/', __DIR__ . '/vendor/'];
+
+foreach ($dirs as $dir) {
+    $file = $dir . 'autoload.php';
+
+    if (file_exists($file)) {
+        define('COMPILER_COMPOSER_INSTALL', $file);
+        define('COMPILER_COMPOSER_DIR', $dir . 'composer');
+        break;
+    }
+}
+
+unset($file);
+
+if (!defined('COMPILER_COMPOSER_INSTALL')) {
+    echo 'You need to set up the project dependencies using the following commands:' . PHP_EOL .
+        'wget http://getcomposer.org/composer.phar' . PHP_EOL .
+        'php composer.phar install' . PHP_EOL;
+    exit(1);
+}
+
+// Include class loader.
+require COMPILER_COMPOSER_INSTALL;
+
+// Set PHP variables.
+error_reporting(-1);
+
+if (function_exists('ini_set')) {
+    ini_set('display_errors', 1);
+
+    // If we have pinba, disable it.
+    if (extension_loaded('pinba')) {
+        ini_set('pinba.enabled', false);
+    }
+
+    // If we have newrelic, disable it.
+    if (extension_loaded('newrelic')) {
+        ini_set('newrelic.enabled', false);
+    }
+}
+
+use In2pire\Cli\Compiler as CliCompiler;
+
+// Backup classmap.
+if (!CliCompiler::backupComposer(COMPILER_COMPOSER_DIR)) {
+    echo 'Cannot backup composer directory', PHP_EOL;
+    exit(1);
+}
+
+try {
+    $compiler = new CliCompiler();
+    $code = (int) $compiler->run();
+} catch (\Exception $e) {
+    echo 'Failed to compile phar: [', get_class($e), '] ', $e->getMessage(), ' at ', $e->getFile(), ':', $e->getLine(), PHP_EOL;
+    $code = 1;
+}
+
+// Restore classmap.
+if (!CliCompiler::restoreComposer(COMPILER_COMPOSER_DIR)) {
+    echo 'Cannot restore composer directory', PHP_EOL;
+    exit(1);
+}
+
+exit($code);

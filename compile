@@ -6,7 +6,7 @@ if (PHP_SAPI !== 'cli') {
     exit(1);
 }
 
-$dirs = [__DIR__ . '/../../', __DIR__ . '/../vendor/', __DIR__ . '/vendor/'];
+$dirs = [__DIR__ . '/../../../../../../', __DIR__ . '/../../../../../vendor/', __DIR__ . '/../../../../vendor/'];
 
 foreach ($dirs as $dir) {
     $file = $dir . 'autoload.php';

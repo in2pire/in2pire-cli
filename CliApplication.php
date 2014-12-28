@@ -73,6 +73,11 @@ class CliApplication extends BaseCliApplication
             $this->version = $this->settings['version'];
         }
 
+        // Read application description.
+        if (isset($this->settings['description'])) {
+            $this->description = $this->settings['description'];
+        }
+
         if (isset($this->settings['token'])) {
             foreach ($this->settings['token'] as $key => $callback) {
                 list($class, $action) = explode('::', $callback);

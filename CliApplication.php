@@ -33,6 +33,13 @@ class CliApplication extends BaseCliApplication
     protected $version = null;
 
     /**
+     * Description.
+     *
+     * @var string
+     */
+    protected $description = null;
+
+    /**
      * CLI input.
      * @var Symfony\Component\Console\Input\ArgvInput
      */
@@ -91,7 +98,7 @@ class CliApplication extends BaseCliApplication
         }
 
         // Prepare symfony cli application.
-        $this->runner = new ConsoleApplication($this->name, $this->version);
+        $this->runner = new ConsoleApplication($this->name, $this->version, $this->description);
         $this->request = new ConsoleInput();
         $this->response = new ConsoleOutput();
 

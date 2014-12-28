@@ -25,6 +25,7 @@ class Application extends \Symfony\Component\Console\Application
     public function __construct($name = 'UNKNOWN', $version = 'UNKNOWN', $description = null)
     {
         parent::__construct($name, $version);
+        $this->description = $description;
     }
 
     /**

@@ -76,6 +76,9 @@ abstract class CliQuestion
      *   Data input.
      * @param OutputInterface $output
      *   Data output.
+     *
+     * @return boolean
+     *   True if passes the question. Otherwise false.
      */
     abstract public function ask(InputInterface $input, OutputInterface $output);
 }

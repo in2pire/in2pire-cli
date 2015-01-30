@@ -113,6 +113,18 @@ class CliApplication extends BaseCliApplication
                 $this->commands[$commandName] = $command;
             }
         }
+
+        // Allow to change default command in configuration file.
+        if (!empty($this->settings['default-command'])) {
+            $defaultCommand = $this->settings['default-command'];
+
+            if (empty($this->commands[$defaultCommand])) {
+                throw new \RuntimeException('Cannot find default command ' . $defaultCommand);
+            }
+
+            $defaultCommand = $this->commands[$defaultCommand];
+            $this->runner->setDefaultCommand($defaultCommand->getName());
+        }
     }
 
     /**

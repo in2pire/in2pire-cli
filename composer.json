@@ -21,9 +21,11 @@
         "symfony/console": "@stable",
         "in2pire/utility": "@stable"
     },
+    "suggest": {
+        "in2ipre/cli-compiler": "IN2PIRE CLI Compiler"
+    },
     "autoload": {
         "psr-0": { "In2pire\\Cli\\": "" }
     },
-    "target-dir": "In2pire/Cli",
-    "bin": ["compile"]
+    "target-dir": "In2pire/Cli"
 }

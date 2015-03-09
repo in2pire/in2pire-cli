@@ -19,7 +19,7 @@
         "php": ">=5.4",
         "symfony/yaml": "@stable",
         "symfony/console": "@stable",
-        "in2pire/utility": "@stable"
+        "in2pire/utility": ">=1.0.2"
     },
     "suggest": {
         "in2ipre/cli-compiler": "IN2PIRE CLI Compiler"

@@ -15,8 +15,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Input\InputArgument as ConsoleInputArgument;
-use Symfony\Component\Console\Input\InputOption as ConsoleInputOption;
 use In2pire\Cli\Configuration;
+use In2pire\Cli\Input\InputDefinition;
+use In2pire\Cli\Input\InputOption as ConsoleInputOption;
 use In2pire\Cli\Token;
 use In2pire\Cli\Task\Container as TaskContainer;
 use In2pire\Cli\Question\Container as QuestionContainer;
@@ -90,6 +91,9 @@ abstract class CliCommand extends ConsoleCommand
     {
         // Contruct symfony command.
         parent::__construct($this->name);
+
+        // Set new definition.
+        $this->setDefinition(new InputDefinition());
 
         // Set status
         $this->returnCode = static::RETURN_SUCCESS;

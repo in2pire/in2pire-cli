@@ -410,7 +410,7 @@ abstract class CliCommand extends ConsoleCommand
 
             // Failed to execute task.
             if ($task && !$this->executeTask($task, $input, $output, $data)) {
-                static::RETURN_ERROR;
+                return static::RETURN_ERROR;
             }
         }
 

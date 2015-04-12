@@ -21,16 +21,19 @@ class InputDefinition extends ConsoleInputDefinition
     public function getSynopsis()
     {
         $elements = array();
+        $flags = array();
 
         foreach ($this->getOptions() as $option) {
             $shortcut = $option->getShortcut() ? sprintf('-%s|', $option->getShortcut()) : '';
 
             if ($option instanceof InputOption && $option->isFlag()) {
-                $elements[] = sprintf('[%s--%s]', $shortcut, $option->getName());
+                $flags[] = sprintf('[%s--%s]', $shortcut, $option->getName());
             } else {
                 $elements[] = sprintf('[' . ($option->isValueRequired() ? '%s--%s="..."' : ($option->isValueOptional() ? '%s--%s[="..."]' : '%s--%s')) . ']', $shortcut, $option->getName());
             }
         }
+
+        $elements = array_merge($elements, $flags);
 
         foreach ($this->getArguments() as $argument) {
             $elements[] = sprintf($argument->isRequired() ? '%s' : '[%s]', $argument->getName() . ($argument->isArray() ? '1' : ''));

@@ -15,8 +15,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Input\InputArgument as ConsoleInputArgument;
-use Symfony\Component\Console\Input\InputOption as ConsoleInputOption;
 use In2pire\Cli\Configuration;
+use In2pire\Cli\Input\InputDefinition;
+use In2pire\Cli\Input\InputOption as ConsoleInputOption;
 use In2pire\Cli\Token;
 use In2pire\Cli\Task\Container as TaskContainer;
 use In2pire\Cli\Question\Container as QuestionContainer;
@@ -90,6 +91,12 @@ abstract class CliCommand extends ConsoleCommand
     {
         // Contruct symfony command.
         parent::__construct($this->name);
+
+        // Set new definition.
+        $this->setDefinition(new InputDefinition());
+
+        // Set status
+        $this->returnCode = static::RETURN_SUCCESS;
 
         // Set running application.
         $this->app = $app;
@@ -398,19 +405,16 @@ abstract class CliCommand extends ConsoleCommand
      */
     protected function executeTasks(InputInterface $input, OutputInterface $output, $data)
     {
-        $return = true;
-
         foreach ($this->tasks as $taskId) {
             $task = TaskContainer::create($taskId, $this);
 
             // Failed to execute task.
             if ($task && !$this->executeTask($task, $input, $output, $data)) {
-                $return = false;
-                break;
+                return static::RETURN_ERROR;
             }
         }
 
-        return $return;
+        return static::RETURN_SUCCESS;
     }
 
     /**
@@ -421,16 +425,18 @@ abstract class CliCommand extends ConsoleCommand
      * @param OutputInterface $output
      *   Output.
      *
-     * @return In2pire\Cli\Command\CliCommand
-     *   The called object.
+     * @return boolean
+     *   True if passes all questions. Otherwise false.
      */
     protected function askQuestions(InputInterface $input, OutputInterface $output)
     {
         foreach ($this->questions as $question) {
-            $question->ask($input, $output);
+            if (!$question->ask($input, $output)) {
+                return static::RETURN_ERROR;
+            }
         }
 
-        return $this;
+        return static::RETURN_SUCCESS;
     }
 
     /**
@@ -447,7 +453,10 @@ abstract class CliCommand extends ConsoleCommand
     protected function doExecute(InputInterface $input, OutputInterface $output)
     {
         // Ask questions.
-        $this->askQuestions($input, $output);
+        if ($this->askQuestions($input, $output) == static::RETURN_ERROR) {
+            return static::RETURN_ERROR;
+        }
+
         // Prepare data.
         $data = $this->prepareData($input);
         // Pre-execute
@@ -473,10 +482,14 @@ abstract class CliCommand extends ConsoleCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->returnCode = 0;
-        $this->doPreExecute($input, $output);
-        $this->returnCode = (int) !$this->doExecute($input, $output);
-        $this->doPostExecute($input, $output);
+        try {
+            $this->doPreExecute($input, $output);
+            $this->returnCode = $this->doExecute($input, $output);
+            $this->doPostExecute($input, $output);
+        } catch(Exception $e) {
+            $this->returnCode = static::RETURN_ERROR;
+            throw $e;
+        }
 
         return $this->returnCode;
     }

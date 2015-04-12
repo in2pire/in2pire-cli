@@ -11,6 +11,7 @@
 namespace In2pire\Cli;
 
 use Symfony\Component\Yaml\Yaml;
+use In2pire\Component\Utility\NestedArray;
 
 /**
  * Configuration.
@@ -85,8 +86,22 @@ final class Configuration
             return null;
         }
 
-        // Parse configuration and return.
-        return $configurations[$namespace] = Yaml::parse($file);
+        // Parse configuration.
+        $configuration = Yaml::parse($file);
+
+        if (is_array($configuration) && !empty($configuration['inherits'])) {
+            $allConfiguration = [];
+
+            foreach ($configuration['inherits'] as $parentNamespace) {
+                $allConfiguration[] = static::load($parentNamespace);
+            }
+
+            $allConfiguration[] = $configuration;
+            $configuration = static::merge($allConfiguration);
+            unset($configuration['inherits']);
+        }
+
+        return $configurations[$namespace] = $configuration;
     }
 
     /**
@@ -130,5 +145,51 @@ final class Configuration
     {
         $configuration = static::load($namespace, $require);
         return array_key_exists($name, $configuration) ? $configuration[$name] : $default;
+    }
+
+    /**
+     * Merge configuration.
+     *
+     * @param array $configs
+     *   Group of configuration.
+     *
+     * @return mixed
+     *   Merged configuration.
+     */
+    protected static function merge(array $configs)
+    {
+        $objects = array_filter($configs, 'is_object');
+
+        if (!empty($objects)) {
+            $listConfigs = [];
+
+            foreach ($configs as $config) {
+                if (!is_object($config)) {
+                    throw new \RuntimeException('Cannot merge object with other types');
+                }
+
+                $listConfigs[] = (array) $config;
+            }
+
+            $result = (object) static::merge($listConfigs);
+        } else {
+            foreach ($configs as $config) {
+                foreach ($config as $key => $value) {
+                    $existed = isset($result[$key]);
+
+                    switch (true) {
+                        case ($existed && (is_object($result[$key]) || is_object($value))):
+                        case ($existed && (is_array($result[$key]) && is_array($value))):
+                            $result[$key] = static::merge(array($result[$key], $value));
+                            break;
+
+                        default:
+                            $result[$key] = $value;
+                    }
+                }
+            }
+        }
+
+        return $result;
     }
 }

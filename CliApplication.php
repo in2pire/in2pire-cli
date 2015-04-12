@@ -10,10 +10,10 @@
 
 namespace In2pire\Cli;
 
-use Symfony\Component\Console\Input\ArgvInput as ConsoleInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use In2pire\Cli\Application as ConsoleApplication;
 use In2pire\Cli\Command\Container as CommandContainer;
+use In2pire\Cli\Input\ArgvInput as ConsoleInput;
 use In2pire\Component\Utility\String;
 
 class CliApplication extends BaseCliApplication
@@ -31,6 +31,13 @@ class CliApplication extends BaseCliApplication
      * @var string
      */
     protected $version = null;
+
+    /**
+     * Description.
+     *
+     * @var string
+     */
+    protected $description = null;
 
     /**
      * CLI input.
@@ -73,6 +80,11 @@ class CliApplication extends BaseCliApplication
             $this->version = $this->settings['version'];
         }
 
+        // Read application description.
+        if (isset($this->settings['description'])) {
+            $this->description = $this->settings['description'];
+        }
+
         if (isset($this->settings['token'])) {
             foreach ($this->settings['token'] as $key => $callback) {
                 list($class, $action) = explode('::', $callback);
@@ -86,7 +98,7 @@ class CliApplication extends BaseCliApplication
         }
 
         // Prepare symfony cli application.
-        $this->runner = new ConsoleApplication($this->name, $this->version);
+        $this->runner = new ConsoleApplication($this->name, $this->version, $this->description);
         $this->request = new ConsoleInput();
         $this->response = new ConsoleOutput();
 
@@ -100,6 +112,18 @@ class CliApplication extends BaseCliApplication
                 $this->runner->add($command);
                 $this->commands[$commandName] = $command;
             }
+        }
+
+        // Allow to change default command in configuration file.
+        if (!empty($this->settings['default-command'])) {
+            $defaultCommand = $this->settings['default-command'];
+
+            if (empty($this->commands[$defaultCommand])) {
+                throw new \RuntimeException('Cannot find default command ' . $defaultCommand);
+            }
+
+            $defaultCommand = $this->commands[$defaultCommand];
+            $this->runner->setDefaultCommand($defaultCommand->getName());
         }
     }
 

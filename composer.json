@@ -22,7 +22,7 @@
         "in2pire/utility": ">=1.0.2"
     },
     "suggest": {
-        "in2ipre/cli-compiler": "IN2PIRE CLI Compiler"
+        "in2pire/cli-compiler": "IN2PIRE CLI Compiler"
     },
     "autoload": {
         "psr-0": { "In2pire\\Cli\\": "" }

@@ -25,6 +25,13 @@ class InputOption extends ConsoleInputOption
     protected $mode;
 
     /**
+     * Possible values.
+     *
+     * @var array
+     */
+    protected $possibleValues = null;
+
+    /**
      * @inheritdoc
      */
     public function __construct($name, $shortcut = null, $mode = null, $description = '', $default = null)
@@ -50,5 +57,42 @@ class InputOption extends ConsoleInputOption
     public function isFlag()
     {
         return static::VALUE_FLAG === (static::VALUE_FLAG & $this->mode);
+    }
+
+    /**
+     * Get possible values.
+     *
+     * @return array
+     *   Possible values.
+     */
+    public function getPossibleValues()
+    {
+        return $this->possibleValues;
+    }
+
+    /**
+     * Set possible values.
+     *
+     * @param array $values
+     *   Possible values.
+     *
+     * @return \In2pire\Cli\Input\InputOption
+     *   The called object.
+     */
+    public function setPossibleValues($values)
+    {
+        $this->possibleValues = $values;
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function equals(ConsoleInputOption $option)
+    {
+        return parent::equals($option)
+            && $option->isFlag() === $this->isFlag()
+            && $option->getPossibleValues() === $this->getPossibleValues();
+        ;
     }
 }

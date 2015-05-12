@@ -255,7 +255,7 @@ HEADERS;
                     $function .= $tab . $tab . $tab . 'else' . PHP_EOL;
                     $function .= $tab . $tab . $tab . $tab . 'case "$prev" in' . PHP_EOL;
 
-                    foreach ($possibleOptionValues as $option => $possibleOptionValue) {
+                    foreach ($caseContents[$case]['possibleOptionValues'] as $option => $possibleOptionValue) {
                         $function .= $tab . $tab . $tab . $tab . $tab . '"--' . $option . '")' . PHP_EOL;
                         $function .= $tab . $tab . $tab . $tab . $tab . $tab . 'options=("' . implode('" "', $possibleOptionValue) . '")' . PHP_EOL;
                         $function .= $tab . $tab . $tab . $tab . $tab . ';;' . PHP_EOL;

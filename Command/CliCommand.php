@@ -150,13 +150,47 @@ abstract class CliCommand extends ConsoleCommand
         if (!empty($this->settings['options']) && is_array($this->settings['options'])) {
             foreach ($this->settings['options'] as $definition) {
                 if (!empty($definition['name'])) {
-                    $name        = $definition['name'];
-                    $shortcut    = empty($definition['shortcut']) ? null : $definition['shortcut'];
-                    $mode        = empty($definition['mode']) ? null : (int) $definition['mode'];
-                    $description = empty($definition['description']) ? '' : Token::replace($definition['description']);
-                    $default     = empty($definition['default']) ? null : Token::replace($definition['default']);
+                    $name           = $definition['name'];
+                    $shortcut       = empty($definition['shortcut']) ? null : $definition['shortcut'];
+                    $mode           = empty($definition['mode']) ? null : (int) $definition['mode'];
+                    $description    = empty($definition['description']) ? '' : Token::replace($definition['description']);
+                    $default        = empty($definition['default']) ? null : Token::replace($definition['default']);
+                    $possibleValues = null;
 
-                    $definitions[] = new ConsoleInputOption($name, $shortcut, $mode, $description, $default);
+                    if (!empty($definition['possible-values'])) {
+                        if (is_array($definition['possible-values'])) {
+                            $possibleValues = $definition['possible-values'];
+                        } else {
+                            $tokenizedPossibleValues = Token::replace($definition['possible-values']);
+
+                            if ($tokenizedPossibleValues != $definition['possible-values']) {
+                                $possibleValues = array_map('trim', explode(',', $tokenizedPossibleValues));
+                            }
+                        }
+                    }
+
+                    if (!empty($possibleValues)) {
+                        $possibleValues = array_map(function ($value) {
+                            return $value === '' ? '<empty>' : $value;
+                        }, $possibleValues);
+                        $possibleValuesText = 'Possible values: ' . implode(', ', $possibleValues);
+
+                        if (empty($description)) {
+                            $description = $possibleValuesText;
+                        } elseif (substr($description, '-1') != '.') {
+                            $description .= '. ' . $possibleValuesText;
+                        } else {
+                            $description .= ' ' . $possibleValuesText;
+                        }
+                    }
+
+                    $inputOption = new ConsoleInputOption($name, $shortcut, $mode, $description, $default);
+
+                    if (!empty($possibleValues)) {
+                        $inputOption->setPossibleValues($possibleValues);
+                    }
+
+                    $definitions[] = $inputOption;
                 }
             }
         }

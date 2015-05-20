@@ -98,7 +98,7 @@ class CliApplication extends BaseCliApplication
         }
 
         // Prepare symfony cli application.
-        $this->runner = new ConsoleApplication($this->name, $this->version, $this->description);
+        $this->runner = $this->getRunner();
         $this->request = new ConsoleInput();
         $this->response = new ConsoleOutput();
 
@@ -125,6 +125,21 @@ class CliApplication extends BaseCliApplication
             $defaultCommand = $this->commands[$defaultCommand];
             $this->runner->setDefaultCommand($defaultCommand->getName());
         }
+    }
+
+    /**
+     * Get console application object.
+     *
+     * @return \Symfony\Component\Console\Application
+     *   Console Application.
+     */
+    protected function getRunner()
+    {
+        if (null === $this->runner) {
+            $this->runner = new ConsoleApplication($this->name, $this->version, $this->description);
+        }
+
+        return $this->runner;
     }
 
     /**

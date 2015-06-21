@@ -10,7 +10,7 @@
 
 namespace In2pire\Cli\Command;
 
-use Symfony\Component\Console\Command\Command as ConsoleCommand;
+use Symfony\Component\Console\Command\Command as BaseCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\NullOutput;
@@ -27,7 +27,7 @@ use In2pire\Component\Utility\NestedArray;
 /**
  * Base Cli Command.
  */
-abstract class CliCommand extends ConsoleCommand
+abstract class CliCommand extends BaseCommand
 {
     /**
      * Error code.

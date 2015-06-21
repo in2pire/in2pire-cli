@@ -10,7 +10,10 @@
 
 namespace In2pire\Cli;
 
-use Symfony\Component\Yaml\Yaml;
+use In2pire\Cli\Configuration\PhpConfiguration;
+use In2pire\Cli\Configuration\YamlConfiguration;
+use In2pire\Cli\Configuration\Exception\FileNotFoundException;
+use In2pire\Cli\Configuration\Exception\RuntimeException;
 use In2pire\Component\Utility\NestedArray;
 
 /**
@@ -18,11 +21,68 @@ use In2pire\Component\Utility\NestedArray;
  */
 final class Configuration
 {
-    protected static $confPath = APP_CONF_PATH;
+    /**
+     * Path to configuration folder.
+     *
+     * @var string
+     */
+    protected $confPath = '.';
 
-    protected static function setConfigPath($path)
+    /**
+     * Cached configuration.
+     *
+     * @var array
+     */
+    protected $cache = [];
+
+    /**
+     * Get configuration instance.
+     *
+     * @param string $id
+     *   Instance ID.
+     *
+     * @return In2pire\Cli\Configuration
+     *   Configuration.
+     */
+    public static function getInstance($id = 'application')
     {
-        static::$confPath = $path;
+        static $instances = [];
+
+        if (isset($instances[$id])) {
+            return $instances[$id];
+        }
+
+        return $instances[$id] = new static();
+    }
+
+    /**
+     * Init configuration.
+     *
+     * @param string $confPath
+     *   Path to configuration folder.
+     * @param boolean $useCache
+     *   Check wether use cached configuration.
+     */
+    public function init($confPath, $useCache = true)
+    {
+        $this->confPath = $confPath;
+
+        if ($useCache) {
+            $cachedConfig = new PhpConfiguration();
+            $this->cache = $cachedConfig->get();
+            unset($cachedConfig);
+        }
+    }
+
+    /**
+     * Set path to configuration folder.
+     *
+     * @param string $path
+     *   Path.
+     */
+    protected function setConfigPath($path)
+    {
+        $this->confPath = $path;
     }
 
     /**
@@ -31,9 +91,9 @@ final class Configuration
      * @return string
      *   Path.
      */
-    protected static function getConfigPath()
+    protected function getConfigPath()
     {
-        return static::$confPath;
+        return $this->confPath;
     }
 
     /**
@@ -45,13 +105,13 @@ final class Configuration
      * @return string
      *   Path to configuration file.
      */
-    protected static function getConfigFile($namespace)
+    protected function getConfigFile($namespace)
     {
         if (empty($namespace)) {
-            throw new \UnexpectedValueException('Namespace is empty');
+            throw new RuntimeException('Namespace is empty');
         }
 
-        return static::getConfigPath() . '/' . str_replace('.', '/', $namespace) . '.yml';
+        return $this->getConfigPath() . '/' . str_replace('.', '/', $namespace) . '.yml';
     }
 
     /**
@@ -66,42 +126,40 @@ final class Configuration
      * @return mixed|null
      *   List of configurations or null if file not found.
      */
-    protected static function load($namespace, $require = false)
+    protected function load($namespace, $require = false)
     {
-        // Static cache.
-        static $configurations = [];
-
         // If cache is set.
-        if (isset($configurations[$namespace])) {
-            return $configurations[$namespace];
+        if (isset($this->cache[$namespace])) {
+            return $this->cache[$namespace];
         }
 
-        $file = static::getConfigFile($namespace);
+        $file = $this->getConfigFile($namespace);
+        $configuration = null;
 
-        if (!file_exists($file)) {
+        try {
+            $configFile = new YamlConfiguration($file);
+            $configuration = $configFile->get();
+
+            if (is_array($configuration) && !empty($configuration['inherits'])) {
+                $allConfiguration = [];
+
+                foreach ($configuration['inherits'] as $parentNamespace) {
+                    $allConfiguration[] = $this->load($parentNamespace);
+                }
+
+                $allConfiguration[] = $configuration;
+                $configuration = $this->merge($allConfiguration);
+                unset($allConfiguration, $configuration['inherits']);
+            }
+
+            unset($configFile);
+        } catch (FileNotFoundException $e) {
             if ($require) {
-                throw new \RuntimeException('Could not find settings file for ' . $namespace);
+                throw new FileNotFoundException('Could not find settings file for ' . $namespace);
             }
-
-            return null;
         }
 
-        // Parse configuration.
-        $configuration = Yaml::parse($file);
-
-        if (is_array($configuration) && !empty($configuration['inherits'])) {
-            $allConfiguration = [];
-
-            foreach ($configuration['inherits'] as $parentNamespace) {
-                $allConfiguration[] = static::load($parentNamespace);
-            }
-
-            $allConfiguration[] = $configuration;
-            $configuration = static::merge($allConfiguration);
-            unset($configuration['inherits']);
-        }
-
-        return $configurations[$namespace] = $configuration;
+        return $this->cache[$namespace] = $configuration;
     }
 
     /**
@@ -115,12 +173,10 @@ final class Configuration
      *
      * @return mixed|null
      *   List of configurations or null if file not found.
-     *
-     * @see In2pire\Memcached\Configuration::load()
      */
-    public static function getAll($namespace, $require = false)
+    public function getAll($namespace, $require = false)
     {
-        return static::load($namespace, $require);
+        return $this->load($namespace, $require);
     }
 
     /**
@@ -138,12 +194,10 @@ final class Configuration
      *
      * @return mixed|null
      *   Configurations or null if file not found.
-     *
-     * @see In2pire\Memcached\Configuration::load()
      */
-    public static function get($namespace, $name, $default = null, $require = false)
+    public function get($namespace, $name, $default = null, $require = false)
     {
-        $configuration = static::load($namespace, $require);
+        $configuration = $this->load($namespace, $require);
         return array_key_exists($name, $configuration) ? $configuration[$name] : $default;
     }
 
@@ -156,7 +210,7 @@ final class Configuration
      * @return mixed
      *   Merged configuration.
      */
-    protected static function merge(array $configs)
+    protected function merge(array $configs)
     {
         $objects = array_filter($configs, 'is_object');
 
@@ -165,13 +219,13 @@ final class Configuration
 
             foreach ($configs as $config) {
                 if (!is_object($config)) {
-                    throw new \RuntimeException('Cannot merge object with other types');
+                    throw new RuntimeException('Cannot merge object with other types');
                 }
 
                 $listConfigs[] = (array) $config;
             }
 
-            $result = (object) static::merge($listConfigs);
+            $result = (object) $this->merge($listConfigs);
         } else {
             foreach ($configs as $config) {
                 foreach ($config as $key => $value) {
@@ -180,7 +234,7 @@ final class Configuration
                     switch (true) {
                         case ($existed && (is_object($result[$key]) || is_object($value))):
                         case ($existed && (is_array($result[$key]) && is_array($value))):
-                            $result[$key] = static::merge(array($result[$key], $value));
+                            $result[$key] = $this->merge(array($result[$key], $value));
                             break;
 
                         default:

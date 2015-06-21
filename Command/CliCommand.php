@@ -101,7 +101,7 @@ abstract class CliCommand extends BaseCommand
         // Set running application.
         $this->app = $app;
         // Get setting.
-        $this->settings = Configuration::getAll('command.' . $this->name, true);
+        $this->settings = Configuration::getInstance()->getAll('command.' . $this->name, true);
 
         // Prepare command information.
         if (!empty($this->settings['description'])) {

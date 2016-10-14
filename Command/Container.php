@@ -10,7 +10,7 @@
 
 namespace In2pire\Cli\Command;
 
-use In2pire\Component\Utility\String;
+use In2pire\Component\Utility\Text;
 
 /**
  * Command container.
@@ -43,7 +43,7 @@ final class Container
             } else {
                 // FQCN
                 $class = explode('.', $command);
-                $class = array_map(array('In2pire\\Component\\Utility\\String', 'convertToCamelCase'), $class);
+                $class = array_map(array('In2pire\\Component\\Utility\\Text', 'convertToCamelCase'), $class);
                 $class = implode('\\', $class);
                 $command = substr($command, strrpos($command, '.') + 1);
             }

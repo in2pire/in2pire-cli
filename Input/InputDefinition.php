@@ -18,29 +18,47 @@ class InputDefinition extends ConsoleInputDefinition
     /**
      * @inheritdoc
      */
-    public function getSynopsis()
+    public function getSynopsis($short = false)
     {
-        $elements = array();
-        $flags = array();
+        $elements = [];
 
-        foreach ($this->getOptions() as $option) {
-            $shortcut = $option->getShortcut() ? sprintf('-%s|', $option->getShortcut()) : '';
+        if ($short && $this->getOptions()) {
+            $elements[] = '[options]';
+        } elseif (!$short) {
+            foreach ($this->getOptions() as $option) {
+                $value = '';
 
-            if ($option instanceof InputOption && $option->isFlag()) {
-                $flags[] = sprintf('[%s--%s]', $shortcut, $option->getName());
-            } else {
-                $elements[] = sprintf('[' . ($option->isValueRequired() ? '%s--%s="..."' : ($option->isValueOptional() ? '%s--%s[="..."]' : '%s--%s')) . ']', $shortcut, $option->getName());
+                if (!(method_exists($option, 'isFlag') && $option->isFlag()) && $option->acceptValue()) {
+                    $value = sprintf(
+                        ' %s%s%s',
+                        $option->isValueOptional() ? '[' : '',
+                        strtoupper($option->getName()),
+                        $option->isValueOptional() ? ']' : ''
+                    );
+                }
+
+                $shortcut = $option->getShortcut() ? sprintf('-%s|', $option->getShortcut()) : '';
+                $elements[] = sprintf('[%s--%s%s]', $shortcut, $option->getName(), $value);
             }
         }
 
-        $elements = array_merge($elements, $flags);
+        if (count($elements) && $this->getArguments()) {
+            $elements[] = '[--]';
+        }
 
         foreach ($this->getArguments() as $argument) {
-            $elements[] = sprintf($argument->isRequired() ? '%s' : '[%s]', $argument->getName() . ($argument->isArray() ? '1' : ''));
+            $element = '<' . $argument->getName() . '>';
+            if (!$argument->isRequired()) {
+                $element = '[' . $element . ']';
+            } elseif ($argument->isArray()) {
+                $element = $element . ' (' . $element . ')';
+            }
 
             if ($argument->isArray()) {
-                $elements[] = sprintf('... [%sN]', $argument->getName());
+                $element .= '...';
             }
+
+            $elements[] = $element;
         }
 
         return implode(' ', $elements);

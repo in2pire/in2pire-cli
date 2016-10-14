@@ -40,6 +40,11 @@ class CliApplication extends BaseCliApplication
     protected $description = null;
 
     /**
+     * Application alias.
+     */
+    protected $alias = null;
+
+    /**
      * CLI input.
      * @var Symfony\Component\Console\Input\ArgvInput
      */
@@ -68,7 +73,7 @@ class CliApplication extends BaseCliApplication
     public function __construct()
     {
         // Read settings file.
-        $this->settings = Configuration::getAll('application', true);
+        $this->settings = Configuration::getInstance()->getAll('application', true);
 
         // Set application name.
         if (isset($this->settings['name'])) {
@@ -83,6 +88,11 @@ class CliApplication extends BaseCliApplication
         // Read application description.
         if (isset($this->settings['description'])) {
             $this->description = $this->settings['description'];
+        }
+
+        // Read application alias.
+        if (isset($this->settings['alias'])) {
+            $this->alias = $this->settings['alias'];
         }
 
         if (isset($this->settings['token'])) {
@@ -136,7 +146,7 @@ class CliApplication extends BaseCliApplication
     protected function getRunner()
     {
         if (null === $this->runner) {
-            $this->runner = new ConsoleApplication($this->name, $this->version, $this->description);
+            $this->runner = new ConsoleApplication($this->name, $this->version, $this->description, $this->alias);
         }
 
         return $this->runner;

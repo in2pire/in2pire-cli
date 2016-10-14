@@ -79,7 +79,7 @@ abstract class CliTask
     public function __construct($command)
     {
         $this->command = $command;
-        $this->settings = Configuration::getAll('task.' . $this->id, true);
+        $this->settings = Configuration::getInstance()->getAll('task.' . $this->id, true);
 
         if (!empty($this->settings['dependencies']) && is_array($this->settings['dependencies'])) {
             $dependencies = $this->settings['dependencies'];

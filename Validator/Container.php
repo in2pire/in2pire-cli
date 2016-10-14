@@ -10,7 +10,7 @@
 
 namespace In2pire\Cli\Validator;
 
-use In2pire\Component\Utility\String;
+use In2pire\Component\Utility\Text;
 
 /**
  * Validator container.
@@ -43,7 +43,7 @@ final class Container
             } else {
                 // FQCN
                 $class = explode('.', $validator);
-                $class = array_map(array('In2pire\\Component\\Utility\\String', 'convertToCamelCase'), $class);
+                $class = array_map(array('In2pire\\Component\\Utility\\Text', 'convertToCamelCase'), $class);
                 $class = implode('\\', $class);
                 $validator = substr($validator, strrpos($validator, '.') + 1);
             }

@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use In2pire\Cli\Application as ConsoleApplication;
 use In2pire\Cli\Command\Container as CommandContainer;
 use In2pire\Cli\Input\ArgvInput as ConsoleInput;
-use In2pire\Component\Utility\String;
+use In2pire\Component\Utility\Text;
 
 class CliApplication extends BaseCliApplication
 {
@@ -100,7 +100,7 @@ class CliApplication extends BaseCliApplication
                 list($class, $action) = explode('::', $callback);
 
                 $class = explode('.', $class);
-                $class = array_map(array('In2pire\\Component\\Utility\\String', 'convertToCamelCase'), $class);
+                $class = array_map(array('In2pire\\Component\\Utility\\Text', 'convertToCamelCase'), $class);
                 $class = implode('\\', $class);
 
                 Token::register($key, [$class, $action]);

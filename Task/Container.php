@@ -10,7 +10,7 @@
 
 namespace In2pire\Cli\Task;
 
-use In2pire\Component\Utility\String;
+use In2pire\Component\Utility\Text;
 
 final class Container
 {
@@ -29,7 +29,7 @@ final class Container
             } else {
                 // FQCN
                 $class = explode('.', $taskId);
-                $class = array_map(array('In2pire\\Component\\Utility\\String', 'convertToCamelCase'), $class);
+                $class = array_map(array('In2pire\\Component\\Utility\\Text', 'convertToCamelCase'), $class);
                 $class = implode('\\', $class);
                 $taskId = substr($taskId, strrpos($taskId, '.') + 1);
             }
